@@ -8,3 +8,7 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Quotation app
+- Quotation data and company settings live in browser localStorage via src/lib/quote-storage.ts (personal-use app, no backend by design).
+- The printable document is a single component (src/components/QuoteDocument.tsx) styled with mm-based print CSS in src/styles.css so PDF export via window.print() matches the paper template exactly.
