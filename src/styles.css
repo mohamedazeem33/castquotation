@@ -241,8 +241,8 @@
 }
 .doc-terms { width: 100%; border-collapse: collapse; margin-top: 2mm; }
 .doc-terms td { border: none; vertical-align: top; padding: 0.8mm 0; }
-.doc-term-no { width: 8mm; text-align: right; padding-right: 3mm; font-weight: 700; }
-.doc-term-text { font-weight: 700; }
+.doc-terms td.doc-term-no { width: 10mm; text-align: right; padding-right: 3mm; font-weight: 700; }
+.doc-terms td.doc-term-text { font-weight: 700; padding-left: 1mm; }
 .doc-term-line { display: flex; gap: 0; }
 .doc-term-line .doc-term-tab { margin-left: 8mm; }
 
