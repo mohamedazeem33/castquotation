@@ -11,4 +11,4 @@
 
 ## Quotation app
 - Quotation data and company settings live in browser localStorage via src/lib/quote-storage.ts (personal-use app, no backend by design).
-- The printable document is a single component (src/components/QuoteDocument.tsx) styled with mm-based print CSS in src/styles.css so PDF export via window.print() matches the paper template exactly.
+- The printable document is a single component (src/components/QuoteDocument.tsx) with a print-only full-width workspace and A4 content-area sizing in src/styles.css so window.print() stays at two pages despite the narrower screen preview.

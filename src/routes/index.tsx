@@ -163,8 +163,8 @@ function QuoteBuilder() {
         )}
       </header>
 
-      <main className="mx-auto max-w-7xl px-6 py-6">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,420px)_1fr]">
+      <main className="quote-workspace mx-auto max-w-7xl px-6 py-6">
+        <div className="quote-workspace-grid grid gap-8 lg:grid-cols-[minmax(0,420px)_1fr]">
           <div className="no-print">
             {tab === "quote" && <QuoteForm quote={quote} onChange={setQuote} />}
             {tab === "settings" && <SettingsPanel settings={settings} onChange={setSettings} />}
@@ -184,7 +184,7 @@ function QuoteBuilder() {
             )}
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="quote-preview overflow-x-auto">
             <QuoteDocument quote={quote} settings={settings} />
           </div>
         </div>
