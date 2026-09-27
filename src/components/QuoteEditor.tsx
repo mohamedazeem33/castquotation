@@ -174,42 +174,123 @@ export function SettingsPanel({
   );
 }
 
+function ClientScanner({ onApply }: { onApply: (p: ParsedClient) => void }) {
+  const [raw, setRaw] = useState("");
+  const [busy, setBusy] = useState<string>("");
+  const [err, setErr] = useState("");
+
+  const handleFile = async (f: File) => {
+    setErr("");
+    setBusy("Reading image… 0%");
+    try {
+      const text = await ocrImage(f, (p) => setBusy(`Reading image… ${Math.round(p * 100)}%`));
+      setRaw(text.trim());
+      if (!text.trim()) setErr("No text found in the image. Try a clearer photo or paste the text.");
+      else onApply(parseClientText(text));
+    } catch {
+      setErr("Could not read the image. Try again or paste the text instead.");
+    } finally {
+      setBusy("");
+    }
+  };
+
+  return (
+    <div className="mb-4 rounded-md border border-dashed border-input p-4">
+      <span className={label}>Scan or paste client details</span>
+      <div className="mb-2 flex flex-wrap items-center gap-2">
+        <label className={`${btn} cursor-pointer`}>
+          Upload business card / ID photo
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleFile(f);
+              e.target.value = "";
+            }}
+          />
+        </label>
+        <button
+          type="button"
+          className={btn}
+          disabled={!raw.trim() || !!busy}
+          onClick={() => onApply(parseClientText(raw))}
+        >
+          Auto-fill from text
+        </button>
+        {busy && <span className="text-xs text-muted-foreground">{busy}</span>}
+      </div>
+      <textarea
+        className={input}
+        rows={5}
+        value={raw}
+        placeholder="Paste text from WhatsApp or email here — or upload a photo and the extracted text appears here."
+        onChange={(e) => setRaw(e.target.value)}
+      />
+      {err && <p className="mt-1 text-xs text-destructive">{err}</p>}
+      <p className="mt-1 text-xs text-muted-foreground">
+        Fields below are filled automatically — check and correct them before saving.
+      </p>
+    </div>
+  );
+}
+
 export function QuoteForm({
   quote,
+  settings,
   onChange,
 }: {
   quote: Quote;
+  settings: Settings;
   onChange: (q: Quote) => void;
 }) {
   const set = (patch: Partial<Quote>) => onChange({ ...quote, ...patch });
   const setItem = (id: string, patch: Partial<LineItem>) =>
     set({ items: quote.items.map((it) => (it.id === id ? { ...it, ...patch } : it)) });
+  const testTypes = settings.testTypes ?? [];
 
   return (
     <div className="space-y-5">
       <div className={card}>
         <h3 className="mb-4 text-sm font-semibold text-foreground">Quotation details</h3>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="mb-4 grid gap-4 sm:grid-cols-2">
           <Field labelText="Reference number" value={quote.ref} onChange={(v) => set({ ref: v })} />
           <Field labelText="Date" value={quote.date} onChange={(v) => set({ date: v })} />
+        </div>
+        <ClientScanner
+          onApply={(p) =>
+            set({
+              attn: p.attn || quote.attn,
+              clientCompany: p.clientCompany || quote.clientCompany,
+              clientEmail: p.clientEmail || quote.clientEmail,
+              clientPhone: p.clientPhone || quote.clientPhone,
+              clientAddress: p.clientAddress || quote.clientAddress,
+            })
+          }
+        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field labelText="Client name (Attention)" value={quote.attn} onChange={(v) => set({ attn: v })} />
           <Field
-            labelText="Client company"
+            labelText="Company name"
             value={quote.clientCompany}
             onChange={(v) => set({ clientCompany: v })}
           />
-          <Field
-            labelText="Client address"
-            rows={2}
-            value={quote.clientAddress}
-            onChange={(v) => set({ clientAddress: v })}
-          />
-          <Field labelText="Attention" value={quote.attn} onChange={(v) => set({ attn: v })} />
-          <Field labelText="Client email" value={quote.clientEmail} onChange={(v) => set({ clientEmail: v })} />
+          <Field labelText="Email" value={quote.clientEmail} onChange={(v) => set({ clientEmail: v })} />
           <Field
             labelText="Phone / ext"
             value={quote.clientPhone}
             onChange={(v) => set({ clientPhone: v })}
           />
+          <div className="sm:col-span-2">
+            <Field
+              labelText="Address"
+              rows={2}
+              value={quote.clientAddress}
+              onChange={(v) => set({ clientAddress: v })}
+            />
+          </div>
         </div>
         <div className="mt-4 grid gap-4">
           <Field
