@@ -1,11 +1,20 @@
 export type LineItem = {
   id: string;
+  testType?: string;
   description: string;
   notes: string[];
   qty: string;
   unit: string;
   rate: string;
   rateOnly: boolean;
+};
+
+export type TestType = {
+  id: string;
+  name: string;
+  description: string;
+  unit: string;
+  rate: string;
 };
 
 export type Settings = {
@@ -25,7 +34,24 @@ export type Settings = {
   signature: string; // data URL
   terms: string[];
   lastRef: string;
+  testTypes: TestType[];
 };
+
+const tt = (name: string, description: string, unit: string, rate: string): TestType => ({
+  id: name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+  name,
+  description,
+  unit,
+  rate,
+});
+
+export const DEFAULT_TEST_TYPES: TestType[] = [
+  tt("GPR Scanning", "Ground Penetrating Radar (GPR) scanning to locate embedded services and reinforcement", "Per Day", ""),
+  tt("Rebar Detection", "Rebar detection / cover meter survey to determine rebar location and concrete cover", "Per Location", ""),
+  tt("Mobilisation of Team & Equipment", "Mobilisation of Team & Equipment", "Per Trip", ""),
+  tt("Issue/Preparation of Report", "Issue / Preparation of Report", "Per Report", ""),
+  tt("PE Endorsement", "Professional Engineer (PE) Endorsement of Report", "Per Report", ""),
+];
 
 export type Quote = {
   id: string;
@@ -73,6 +99,7 @@ export const DEFAULT_SETTINGS: Settings = {
     "Price quoted is subjected to prevailing Government GST.",
   ],
   lastRef: "TM/Q/2608/197R1",
+  testTypes: DEFAULT_TEST_TYPES,
 };
 
 export const DEFAULT_FACILITIES = [
