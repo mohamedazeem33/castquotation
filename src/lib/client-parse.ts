@@ -26,7 +26,7 @@ export function parseClientText(raw: string): ParsedClient {
   lines.forEach((l, i) => {
     const m = l.match(LABEL_RE);
     if (!m) return;
-    const key = m[1].toLowerCase();
+    const key = (m[1] ?? "").toLowerCase();
     const val = l.slice(m[0].length).trim();
     if (!val) return;
     if (["name", "attn", "attention", "contact"].includes(key) && !out.attn) out.attn = val;
@@ -59,7 +59,7 @@ export function parseClientText(raw: string): ParsedClient {
 
   if (!out.clientCompany) {
     const i = lines.findIndex((l, j) => !used.has(j) && COMPANY_RE.test(l));
-    if (i >= 0) { out.clientCompany = lines[i]; used.add(i); }
+    if (i >= 0) { out.clientCompany = lines[i] ?? ""; used.add(i); }
   }
 
   if (!out.clientAddress) {
@@ -78,7 +78,7 @@ export function parseClientText(raw: string): ParsedClient {
         /^[A-Za-z][A-Za-z .'()-]{1,40}$/.test(l) &&
         l.split(" ").length <= 5,
     );
-    if (i >= 0) { out.attn = lines[i]; used.add(i); }
+    if (i >= 0) { out.attn = lines[i] ?? ""; used.add(i); }
   }
   return out;
 }
