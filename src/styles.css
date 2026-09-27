@@ -260,6 +260,10 @@
   .no-print { display: none !important; }
   /* The hosting badge is injected outside the quotation on some previews. */
   .made-with-badge,
+  #lovable-badge,
+  .lovable-badge,
+  lovable-badge,
+  [data-lovable-badge],
   [class*="made-with-badge"],
   a[href*="lovable.dev"] { display: none !important; }
 
@@ -285,6 +289,8 @@
   .doc-page:last-child { page-break-after: auto; break-after: auto; }
   .doc-page-body { flex: 1 1 auto; min-height: 0; }
   .doc-footer { left: 0; right: 0; bottom: 0; font-size: 9px; }
+  .doc-footer span:first-child { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+  .doc-footer span:last-child { margin-left: auto; }
   .doc-top { gap: 6mm; }
   .doc-ref { margin-bottom: 3mm; }
   .doc-logo { height: 12mm; }
@@ -305,6 +311,7 @@
   .doc-terms-heading { margin-top: 9mm; font-size: 11px; }
   .doc-terms { margin-top: 1mm; }
   .doc-terms td { padding: 2px 0; }
+  .doc-terms td.doc-term-text { font-weight: 400; }
   .doc-sign { margin-top: 5mm; }
   .doc-sign th, .doc-sign td { padding: 4px; }
   .doc-sign-box { height: 20mm; }
