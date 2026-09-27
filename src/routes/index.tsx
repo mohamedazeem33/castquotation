@@ -166,7 +166,7 @@ function QuoteBuilder() {
       <main className="quote-workspace mx-auto max-w-7xl px-6 py-6">
         <div className="quote-workspace-grid grid gap-8 lg:grid-cols-[minmax(0,420px)_1fr]">
           <div className="no-print">
-            {tab === "quote" && <QuoteForm quote={quote} onChange={setQuote} />}
+            {tab === "quote" && <QuoteForm quote={quote} settings={settings} onChange={setQuote} />}
             {tab === "settings" && <SettingsPanel settings={settings} onChange={setSettings} />}
             {tab === "history" && (
               <HistoryList

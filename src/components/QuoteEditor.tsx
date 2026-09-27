@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { fileToDataUrl } from "@/lib/quote-storage";
+import { ocrImage, parseClientText, type ParsedClient } from "@/lib/client-parse";
 import {
   letters,
   newItem,
   type Quote,
   type Settings,
   type LineItem,
+  type TestType,
 } from "@/lib/quote-types";
 
 const input =
@@ -134,6 +136,60 @@ export function SettingsPanel({
             />
           </div>
         </div>
+      </div>
+
+      <div className={card}>
+        <h3 className="mb-1 text-sm font-semibold text-foreground">Test types</h3>
+        <p className="mb-4 text-xs text-muted-foreground">
+          Presets for the line item dropdown. Picking one fills the description, unit and rate (still editable per quote).
+        </p>
+        <div className="space-y-3">
+          {(settings.testTypes ?? []).map((t, i) => {
+            const upd = (patch: Partial<TestType>) => {
+              const testTypes = [...settings.testTypes];
+              testTypes[i] = { ...t, ...patch };
+              set({ testTypes });
+            };
+            return (
+              <div key={t.id} className="rounded-md border border-border p-3">
+                <div className="grid gap-3 sm:grid-cols-[1fr_120px_100px]">
+                  <Field labelText="Name" value={t.name} onChange={(v) => upd({ name: v })} />
+                  <Field labelText="Unit" value={t.unit} onChange={(v) => upd({ unit: v })} />
+                  <Field labelText="Rate" value={t.rate} onChange={(v) => upd({ rate: v })} />
+                </div>
+                <div className="mt-3">
+                  <Field
+                    labelText="Description"
+                    rows={2}
+                    value={t.description}
+                    onChange={(v) => upd({ description: v })}
+                  />
+                </div>
+                <button
+                  type="button"
+                  className={`${btn} mt-3`}
+                  onClick={() => set({ testTypes: settings.testTypes.filter((_, j) => j !== i) })}
+                >
+                  Remove
+                </button>
+              </div>
+            );
+          })}
+        </div>
+        <button
+          type="button"
+          className={`${btn} mt-4`}
+          onClick={() =>
+            set({
+              testTypes: [
+                ...(settings.testTypes ?? []),
+                { id: crypto.randomUUID(), name: "New test type", description: "", unit: "", rate: "" },
+              ],
+            })
+          }
+        >
+          Add test type
+        </button>
       </div>
 
       <div className={card}>
@@ -317,6 +373,30 @@ export function QuoteForm({
                 >
                   Remove item
                 </button>
+              </div>
+              <div className="mb-3">
+                <span className={label}>Test type</span>
+                <select
+                  className={input}
+                  value={it.testType ?? ""}
+                  onChange={(e) => {
+                    const t = testTypes.find((x) => x.id === e.target.value);
+                    if (!t) return setItem(it.id, { testType: "" });
+                    setItem(it.id, {
+                      testType: t.id,
+                      description: t.description || t.name,
+                      rate: t.rate,
+                      unit: t.unit || it.unit,
+                    });
+                  }}
+                >
+                  <option value="">— Custom / none —</option>
+                  {testTypes.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <Field
                 labelText="Description"
