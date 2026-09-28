@@ -37,19 +37,19 @@ function bumpRef(ref: string): string {
   if (!m) return ref;
   const base = m[1] ?? ref;
   const n = m[3] ? parseInt(m[3], 10) + 1 : 1;
-  return `${base}R${n}`;
+  return ${base}R${n};
 }
 
 const tabBtn = (active: boolean) =>
-  `rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+  `flex-1 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-colors md:flex-none ${
     active
       ? "bg-primary text-primary-foreground"
       : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
   }`;
 const action =
-  "inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90";
+  "inline-flex w-full items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 sm:w-auto";
 const actionAlt =
-  "inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent";
+  "inline-flex w-full items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent sm:w-auto";
 
 type Tab = "quote" | "settings" | "history";
 
@@ -85,7 +85,7 @@ function QuoteBuilder() {
     saveQuotes(next);
     setQuote(stamped);
     setSettings((s) => ({ ...s, lastRef: stamped.ref }));
-    flash(`Saved ${stamped.ref}`);
+    flash(Saved ${stamped.ref});
   };
 
   const handleNew = () => {
@@ -124,13 +124,15 @@ function QuoteBuilder() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="no-print sticky top-0 z-10 border-b border-border bg-card">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-3">
+      <style>{@media screen and (max-width: 767px) { .quote-preview { zoom: 0.42; } }}</style>
+
+      <header className="no-print z-10 border-b border-border bg-card md:sticky md:top-0">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-3 py-2 sm:gap-3 sm:px-6 sm:py-3">
           <div>
             <h1 className="text-base font-semibold text-foreground">Quotation Builder</h1>
             <p className="text-xs text-muted-foreground">{settings.companyName}</p>
           </div>
-          <nav className="flex gap-1">
+          <nav className="flex w-full gap-1 md:w-auto">
             <button className={tabBtn(tab === "quote")} onClick={() => setTab("quote")}>
               Quotation
             </button>
@@ -141,7 +143,7 @@ function QuoteBuilder() {
               History ({quotes.length})
             </button>
           </nav>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
             <button className={actionAlt} onClick={handleNew}>
               New
             </button>
@@ -157,15 +159,15 @@ function QuoteBuilder() {
           </div>
         </div>
         {status && (
-          <div className="border-t border-border bg-accent px-6 py-1.5 text-xs text-accent-foreground">
+          <div className="border-t border-border bg-accent px-3 py-1.5 text-xs text-accent-foreground sm:px-6">
             {status}
           </div>
         )}
       </header>
 
-      <main className="quote-workspace mx-auto max-w-7xl px-6 py-6">
-        <div className="quote-workspace-grid grid gap-8 lg:grid-cols-[minmax(0,420px)_1fr]">
-          <div className="no-print">
+      <main className="quote-workspace mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6">
+        <div className="quote-workspace-grid grid gap-6 lg:gap-8 lg:grid-cols-[minmax(0,420px)_1fr]">
+          <div className="no-print min-w-0">
             {tab === "quote" && <QuoteForm quote={quote} settings={settings} onChange={setQuote} />}
             {tab === "settings" && <SettingsPanel settings={settings} onChange={setSettings} />}
             {tab === "history" && (
@@ -184,7 +186,7 @@ function QuoteBuilder() {
             )}
           </div>
 
-          <div className="quote-preview overflow-x-auto">
+          <div className="quote-preview min-w-0 overflow-x-auto">
             <QuoteDocument quote={quote} settings={settings} />
           </div>
         </div>
