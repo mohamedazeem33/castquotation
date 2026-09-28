@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const MODEL = "gemini-3.8-flash";
+const MODEL = "gemini-3.5-flash";
 
 const PROMPT = [
   "Extract contact details from this business card, ID card, or pasted text.",
