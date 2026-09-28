@@ -268,6 +268,7 @@ function ClientScanner({ onApply }: { onApply: (p: ParsedClient) => void }) {
     const dataUrl = await fileToDataUrl(f);
     const [head, b64] = dataUrl.split(",");
     const mimeType = head?.match(/data:(.*?);/)?.[1] || f.type || "image/jpeg";
+    if (!b64) return setErr(FAIL_MSG);
     await run({ image: b64, mimeType });
   };
 
