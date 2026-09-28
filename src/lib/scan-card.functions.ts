@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const MODEL = "google/gemini-3.5-flash";
+const MODEL = "gemini-2.5-flash";
 
 const PROMPT = `Extract contact details from this business card, ID card, or pasted text.
 Return ONLY a JSON object with exactly these string keys:
@@ -21,59 +21,37 @@ export const scanCard = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const key = process.env["LOVABLE_API_KEY"];
+    const key = process.env["GEMINI_API_KEY"];
     if (!key) return { ok: false as const, raw: "", error: "AI key missing" };
 
-    const content: unknown[] = [{ type: "text", text: PROMPT }];
+    const parts: unknown[] = [{ text: PROMPT }];
     if (data.image) {
-      content.push({
-        type: "image_url",
-        image_url: { url: `data:${data.mimeType || "image/jpeg"};base64,${data.image}` },
+      parts.push({
+        inline_data: { mime_type: data.mimeType || "image/jpeg", data: data.image },
       });
     } else if (data.text?.trim()) {
-      content.push({ type: "text", text: `Text:\n${data.text}` });
+      parts.push({ text: Text:\n${data.text} });
     } else return { ok: false as const, raw: "", error: "Nothing to read" };
 
     try {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${key}`,
-          "Content-Type": "application/json",
-          "X-Lovable-AIG-SDK": "fetch",
+      const res = await fetch(
+        https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+          body: JSON.stringify({
+            contents: [{ role: "user", parts }],
+            generationConfig: { responseMimeType: "application/json", temperature: 0 },
+          }),
         },
-        body: JSON.stringify({
-          model: MODEL,
-          stream: true,
-          response_format: { type: "json_object" },
-          messages: [{ role: "user", content }],
-        }),
-      });
-      if (!res.ok || !res.body) {
-        return { ok: false as const, raw: await res.text().catch(() => ""), error: `HTTP ${res.status}` };
+      );
+      if (!res.ok) {
+        return { ok: false as const, raw: await res.text().catch(() => ""), error: HTTP ${res.status} };
       }
-      const reader = res.body.getReader();
-      const dec = new TextDecoder();
-      let buf = "";
-      let out = "";
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buf += dec.decode(value, { stream: true });
-        const lines = buf.split("\n");
-        buf = lines.pop() ?? "";
-        for (const l of lines) {
-          const s = l.trim();
-          if (!s.startsWith("data:")) continue;
-          const p = s.slice(5).trim();
-          if (p === "[DONE]") continue;
-          try {
-            out += JSON.parse(p).choices?.[0]?.delta?.content ?? "";
-          } catch {
-            /* partial */
-          }
-        }
-      }
+      const json = await res.json();
+      const out: string = ((json.candidates?.[0]?.content?.parts ?? []) as { text?: string }[])
+        .map((p) => p.text ?? "")
+        .join("");
       const m = out.match(/\{[\s\S]*\}/);
       if (!m) return { ok: false as const, raw: out, error: "No JSON" };
       const j = JSON.parse(m[0]) as Record<string, unknown>;
