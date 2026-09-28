@@ -1,4 +1,4 @@
-```tsx
+
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { QuoteDocument } from "@/components/QuoteDocument";
@@ -23,20 +23,31 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "CAST Quotation Builder — Testing & Inspection Quotes" },
+      {
+        title: "CAST Quotation Builder — Testing & Inspection Quotes",
+      },
       {
         name: "description",
         content:
           "Create, save and export formal CAST Laboratories quotations with fixed terms, line items and a print-ready two-page layout.",
       },
-      { property: "og:title", content: "CAST Quotation Builder" },
+      {
+        property: "og:title",
+        content: "CAST Quotation Builder",
+      },
       {
         property: "og:description",
         content:
           "Build print-ready testing and inspection quotations with saved company details, terms and quotation history.",
       },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      {
+        property: "og:type",
+        content: "website",
+      },
+      {
+        name: "twitter:card",
+        content: "summary_large_image",
+      },
     ],
   }),
   component: QuoteBuilder,
@@ -44,7 +55,10 @@ export const Route = createFileRoute("/")({
 
 function bumpRef(ref: string): string {
   const m = ref.match(/^(.*?)(R(\d+))?$/);
-  if (!m) return ref;
+
+  if (!m) {
+    return ref;
+  }
 
   const base = m[1] ?? ref;
   const n = m[3] ? parseInt(m[3], 10) + 1 : 1;
@@ -111,6 +125,7 @@ function QuoteBuilder() {
     setQuotes(next);
     saveQuotes(next);
     setQuote(stamped);
+
     setSettings((s) => ({
       ...s,
       lastRef: stamped.ref,
@@ -205,15 +220,24 @@ function QuoteBuilder() {
           </nav>
 
           <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
-            <button className={actionAlt} onClick={handleNew}>
+            <button
+              className={actionAlt}
+              onClick={handleNew}
+            >
               New
             </button>
 
-            <button className={actionAlt} onClick={handleDuplicateLast}>
+            <button
+              className={actionAlt}
+              onClick={handleDuplicateLast}
+            >
               Duplicate last quote
             </button>
 
-            <button className={actionAlt} onClick={handleSave}>
+            <button
+              className={actionAlt}
+              onClick={handleSave}
+            >
               Save quotation
             </button>
 
@@ -260,7 +284,6 @@ function QuoteBuilder() {
                 }}
                 onDelete={(id) => {
                   const next = quotes.filter((q) => q.id !== id);
-
                   setQuotes(next);
                   saveQuotes(next);
                 }}
@@ -279,20 +302,4 @@ function QuoteBuilder() {
     </div>
   );
 }
-```
 
-**After pasting it**, run:
-
-```bash
-bun run build
-```
-
-If it says the build is successful, push the changes:
-
-```bash
-git add src/routes/index.tsx
-git commit -m "Fix quotation builder build errors"
-git push
-```
-
-Then redeploy on Vercel.
