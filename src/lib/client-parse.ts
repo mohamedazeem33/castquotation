@@ -83,17 +83,3 @@ export function parseClientText(raw: string): ParsedClient {
   return out;
 }
 
-export async function ocrImage(file: File, onProgress?: (p: number) => void): Promise<string> {
-  const { createWorker } = await import("tesseract.js");
-  const worker = await createWorker("eng", 1, {
-    logger: (m: { status: string; progress: number }) => {
-      if (m.status === "recognizing text") onProgress?.(m.progress);
-    },
-  });
-  try {
-    const { data } = await worker.recognize(file);
-    return data.text;
-  } finally {
-    await worker.terminate();
-  }
-}

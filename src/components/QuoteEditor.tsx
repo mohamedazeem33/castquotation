@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { fileToDataUrl } from "@/lib/quote-storage";
-import { ocrImage, parseClientText, type ParsedClient } from "@/lib/client-parse";
+import { type ParsedClient } from "@/lib/client-parse";
+import { scanCard } from "@/lib/scan-card.functions";
 import {
   letters,
   newItem,
@@ -230,24 +232,43 @@ export function SettingsPanel({
   );
 }
 
+const FAIL_MSG = "Couldn't read this card, please enter details manually.";
+
 function ClientScanner({ onApply }: { onApply: (p: ParsedClient) => void }) {
   const [raw, setRaw] = useState("");
-  const [busy, setBusy] = useState<string>("");
+  const [response, setResponse] = useState("");
+  const [busy, setBusy] = useState("");
   const [err, setErr] = useState("");
+  const scan = useServerFn(scanCard);
 
-  const handleFile = async (f: File) => {
+  const run = async (payload: { image?: string; mimeType?: string; text?: string }) => {
     setErr("");
-    setBusy("Reading image… 0%");
+    setBusy(payload.image ? "Reading card…" : "Reading text…");
     try {
-      const text = await ocrImage(f, (p) => setBusy(`Reading image… ${Math.round(p * 100)}%`));
-      setRaw(text.trim());
-      if (!text.trim()) setErr("No text found in the image. Try a clearer photo or paste the text.");
-      else onApply(parseClientText(text));
+      const r = await scan({ data: payload });
+      setResponse(r.raw || "");
+      if (!r.ok) return setErr(FAIL_MSG);
+      const f = r.fields;
+      onApply({
+        attn: f.designation && f.clientName ? `${f.clientName} (${f.designation})` : f.clientName,
+        clientCompany: f.companyName,
+        clientEmail: f.email,
+        clientPhone: f.phone,
+        clientAddress: f.address,
+      });
     } catch {
-      setErr("Could not read the image. Try again or paste the text instead.");
+      setErr(FAIL_MSG);
     } finally {
       setBusy("");
     }
+  };
+
+  const handleFile = async (f: File) => {
+    // Image is only sent for reading — never stored.
+    const dataUrl = await fileToDataUrl(f);
+    const [head, b64] = dataUrl.split(",");
+    const mimeType = head?.match(/data:(.*?);/)?.[1] || f.type || "image/jpeg";
+    await run({ image: b64, mimeType });
   };
 
   return (
@@ -272,7 +293,7 @@ function ClientScanner({ onApply }: { onApply: (p: ParsedClient) => void }) {
           type="button"
           className={btn}
           disabled={!raw.trim() || !!busy}
-          onClick={() => onApply(parseClientText(raw))}
+          onClick={() => run({ text: raw })}
         >
           Auto-fill from text
         </button>
@@ -280,14 +301,22 @@ function ClientScanner({ onApply }: { onApply: (p: ParsedClient) => void }) {
       </div>
       <textarea
         className={input}
-        rows={5}
+        rows={4}
         value={raw}
-        placeholder="Paste text from WhatsApp or email here — or upload a photo and the extracted text appears here."
+        placeholder="Paste text from WhatsApp or email here, then click Auto-fill."
         onChange={(e) => setRaw(e.target.value)}
       />
       {err && <p className="mt-1 text-xs text-destructive">{err}</p>}
+      {response && (
+        <details className="mt-2">
+          <summary className="cursor-pointer text-xs text-muted-foreground">Raw response</summary>
+          <pre className="mt-1 max-h-48 overflow-auto whitespace-pre-wrap rounded bg-muted p-2 text-xs text-foreground">
+            {response}
+          </pre>
+        </details>
+      )}
       <p className="mt-1 text-xs text-muted-foreground">
-        Fields below are filled automatically — check and correct them before saving.
+        Fields below are filled automatically — check and correct them before saving. Card photos are not stored.
       </p>
     </div>
   );
