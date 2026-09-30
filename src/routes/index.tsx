@@ -129,7 +129,7 @@ function QuoteBuilder() {
     setSettings((s) => ({
       ...s,
       lastRef: stamped.ref,
-      lastGst: stamped.gstPercent ?? s.lastGst,
+      lastGst: stamped.gstPercent ?? s.lastGst ?? "9",
     }));
 
     flash(`Saved ${stamped.ref}`);
