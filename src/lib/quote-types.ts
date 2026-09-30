@@ -34,6 +34,7 @@ export type Settings = {
   signature: string; // data URL
   terms: string[];
   lastRef: string;
+  lastGst?: string;
   testTypes: TestType[];
 };
 
@@ -66,6 +67,8 @@ export type Quote = {
   introLine: string;
   items: LineItem[];
   facilities: string[];
+  discount?: string;
+  gstPercent?: string;
   savedAt: string;
 };
 
@@ -120,7 +123,9 @@ export const newItem = (): LineItem => ({
   rateOnly: false,
 });
 
-export const emptyQuote = (ref: string): Quote => ({
+export const emptyQuote = (ref: string, gstPercent = "9"): Quote => ({
+  discount: "",
+  gstPercent,
   id: crypto.randomUUID(),
   ref,
   date: new Date().toLocaleDateString("en-GB", {
@@ -146,6 +151,18 @@ export const amountOf = (it: LineItem): string => {
   const r = parseFloat(it.rate);
   if (isNaN(q) || isNaN(r)) return "";
   return (q * r).toFixed(2);
+};
+
+export const totalsOf = (q: Quote) => {
+  const subtotal = q.items.reduce((s, it) => {
+    const a = parseFloat(amountOf(it));
+    return isNaN(a) ? s : s + a;
+  }, 0);
+  const discount = parseFloat(q.discount ?? "") || 0;
+  const gstPct = parseFloat(q.gstPercent ?? "") || 0;
+  const afterDiscount = subtotal - discount;
+  const gst = (afterDiscount * gstPct) / 100;
+  return { subtotal, discount, gstPct, afterDiscount, gst, total: afterDiscount + gst };
 };
 
 export const letters = "abcdefghijklmnopqrstuvwxyz".split("");

@@ -11,6 +11,7 @@ import {
   type LineItem,
   type TestType,
 } from "@/lib/quote-types";
+import { totalsOf } from "@/lib/quote-types";
 
 const input =
   "w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-ring";
@@ -470,6 +471,29 @@ export function QuoteForm({
         >
           Add row
         </button>
+      </div>
+
+      <div className={card}>
+        <h3 className="mb-4 text-sm font-semibold text-foreground">Totals</h3>
+        {(() => {
+          const t = totalsOf(quote);
+          return (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="sm:col-span-2 text-sm text-muted-foreground">
+                Subtotal: <span className="font-medium text-foreground">S$ {t.subtotal.toFixed(2)}</span>
+              </div>
+              <Field
+                labelText="Discount (S$, flat amount)"
+                value={quote.discount ?? ""}
+                onChange={(v) => set({ discount: v })}
+              />
+              <Field labelText="GST %" value={quote.gstPercent ?? ""} onChange={(v) => set({ gstPercent: v })} />
+              <div className="sm:col-span-2 text-sm text-muted-foreground">
+                Overall total: <span className="font-semibold text-foreground">S$ {t.total.toFixed(2)}</span>
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       <div className={card}>

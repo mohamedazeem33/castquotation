@@ -226,6 +226,9 @@
 .doc-item-notes { margin-top: 1.5mm; }
 .doc-notes-label { font-weight: 700; text-decoration: underline; }
 .doc-facilities { padding: 1.5mm 1.6mm; }
+.doc-table .ta-r { text-align: right; }
+.doc-total-label { font-weight: 600; }
+.doc-total-final td { font-weight: 700; }
 .doc-facilities-label { font-weight: 700; text-decoration: underline; }
 .doc-facilities-list { width: 100%; border-collapse: collapse; }
 .doc-facilities-list td { border: none; padding: 0.4mm 0; vertical-align: top; }

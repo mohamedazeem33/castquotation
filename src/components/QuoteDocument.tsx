@@ -1,4 +1,4 @@
-import { amountOf, letters, type Quote, type Settings } from "@/lib/quote-types";
+import { amountOf, letters, totalsOf, type Quote, type Settings } from "@/lib/quote-types";
 
 function Footer({ page }: { page: number }) {
   return (
@@ -109,6 +109,20 @@ export function QuoteDocument({ quote, settings }: { quote: Quote; settings: Set
                   <td className="ta-c">{amountOf(it)}</td>
                 </tr>
               ))}
+              {(() => {
+                const t = totalsOf(quote);
+                const rows: [string, string][] = [];
+                if (t.subtotal) rows.push(["Subtotal", t.subtotal.toFixed(2)]);
+                if (t.discount) rows.push(["Discount", `-${t.discount.toFixed(2)}`]);
+                if (t.gstPct && t.gst) rows.push([`GST ${t.gstPct}%`, t.gst.toFixed(2)]);
+                if (t.subtotal) rows.push(["Overall Total", t.total.toFixed(2)]);
+                return rows.map(([label, val], i) => (
+                  <tr key={label} className={i === rows.length - 1 ? "doc-total-final" : "doc-total-row"}>
+                    <td colSpan={5} className="ta-r doc-total-label">{label}</td>
+                    <td className="ta-c">{val}</td>
+                  </tr>
+                ));
+              })()}
               <tr>
                 <td colSpan={6} className="doc-facilities">
                   <div className="doc-notes-label">Notes:</div>
