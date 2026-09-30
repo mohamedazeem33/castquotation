@@ -473,6 +473,29 @@ export function QuoteForm({
       </div>
 
       <div className={card}>
+        <h3 className="mb-4 text-sm font-semibold text-foreground">Totals</h3>
+        {(() => {
+          const t = totalsOf(quote);
+          return (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="sm:col-span-2 text-sm text-muted-foreground">
+                Subtotal: <span className="font-medium text-foreground">S$ {t.subtotal.toFixed(2)}</span>
+              </div>
+              <Field
+                labelText="Discount (S$, flat amount)"
+                value={quote.discount ?? ""}
+                onChange={(v) => set({ discount: v })}
+              />
+              <Field labelText="GST %" value={quote.gstPercent ?? ""} onChange={(v) => set({ gstPercent: v })} />
+              <div className="sm:col-span-2 text-sm text-muted-foreground">
+                Overall total: <span className="font-semibold text-foreground">S$ {t.total.toFixed(2)}</span>
+              </div>
+            </div>
+          );
+        })()}
+      </div>
+
+      <div className={card}>
         <h3 className="mb-4 text-sm font-semibold text-foreground">Facilities to be provided by client</h3>
         <div className="space-y-3">
           {quote.facilities.map((f, i) => (
