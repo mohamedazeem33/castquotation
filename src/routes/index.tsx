@@ -96,7 +96,7 @@ function QuoteBuilder() {
 
     setSettings(s);
     setQuotes(loadQuotes());
-    setQuote(emptyQuote(s.lastRef));
+    setQuote(emptyQuote(s.lastRef, s.lastGst ?? "9"));
     setReady(true);
   }, []);
 
@@ -129,13 +129,14 @@ function QuoteBuilder() {
     setSettings((s) => ({
       ...s,
       lastRef: stamped.ref,
+      lastGst: stamped.gstPercent ?? s.lastGst,
     }));
 
     flash(`Saved ${stamped.ref}`);
   };
 
   const handleNew = () => {
-    setQuote(emptyQuote(bumpRef(settings.lastRef)));
+    setQuote(emptyQuote(bumpRef(settings.lastRef), settings.lastGst ?? "9"));
     setTab("quote");
     flash("New quotation started");
   };
@@ -167,6 +168,7 @@ function QuoteBuilder() {
         id: crypto.randomUUID(),
       })),
       facilities: [...last.facilities],
+      gstPercent: settings.lastGst ?? last.gstPercent ?? "9",
       savedAt: new Date().toISOString(),
     });
 
