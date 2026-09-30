@@ -11,6 +11,7 @@ import {
   type LineItem,
   type TestType,
 } from "@/lib/quote-types";
+import { totalsOf } from "@/lib/quote-types";
 
 const input =
   "w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-ring";
