@@ -1,5 +1,5 @@
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { QuoteDocument } from "@/components/QuoteDocument";
 import {
@@ -8,11 +8,13 @@ import {
   SettingsPanel,
 } from "@/components/QuoteEditor";
 import {
+  deleteQuote,
   loadQuotes,
   loadSettings,
-  saveQuotes,
+  saveQuote,
   saveSettings,
 } from "@/lib/quote-storage";
+import { supabase } from "@/integrations/supabase/client";
 import {
   DEFAULT_SETTINGS,
   emptyQuote,
@@ -92,39 +94,63 @@ function QuoteBuilder() {
   const [status, setStatus] = useState("");
 
   useEffect(() => {
-    const s = loadSettings();
-
-    setSettings(s);
-    setQuotes(loadQuotes());
-    setQuote(emptyQuote(s.lastRef, s.lastGst ?? "9"));
-    setReady(true);
+    let alive = true;
+    (async () => {
+      try {
+        const [s, qs] = await Promise.all([loadSettings(), loadQuotes()]);
+        if (!alive) return;
+        setSettings(s);
+        setQuotes(qs);
+        setQuote(emptyQuote(s.lastRef, s.lastGst ?? "9"));
+      } catch {
+        flash("Couldn't load data — check your connection and refresh");
+      }
+      if (alive) setReady(true);
+    })();
+    return () => {
+      alive = false;
+    };
   }, []);
 
   useEffect(() => {
-    if (ready) {
-      saveSettings(settings);
-    }
+    if (!ready) return;
+    const t = window.setTimeout(() => {
+      saveSettings(settings).catch(() => flash("Couldn't save settings"));
+    }, 700);
+    return () => window.clearTimeout(t);
   }, [settings, ready]);
+
+  useEffect(() => {
+    if (tab === "history" && ready) {
+      loadQuotes().then(setQuotes).catch(() => flash("Couldn't load history"));
+    }
+  }, [tab, ready]);
 
   const flash = (msg: string) => {
     setStatus(msg);
     window.setTimeout(() => setStatus(""), 2500);
   };
 
-  const handleSave = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  };
+
+  const handleSave = async () => {
     const stamped = {
       ...quote,
       savedAt: new Date().toISOString(),
     };
 
-    const next = [
-      stamped,
-      ...quotes.filter((q) => q.id !== stamped.id),
-    ];
-
-    setQuotes(next);
-    saveQuotes(next);
-    setQuote(stamped);
+    try {
+      const saved = await saveQuote(stamped);
+      const next = [saved, ...quotes.filter((q) => q.id !== saved.id)];
+      setQuotes(next);
+      setQuote(saved);
+    } catch {
+      flash("Couldn't save quotation — please try again");
+      return;
+    }
 
     setSettings((s) => ({
       ...s,
