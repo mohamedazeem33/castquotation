@@ -20,7 +20,7 @@ import {
   type Settings,
 } from "@/lib/quote-types";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
       {
