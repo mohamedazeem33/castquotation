@@ -14,7 +14,93 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      app_settings: {
+        Row: {
+          data: Json
+          id: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          data?: Json
+          id?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          data?: Json
+          id?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      quotations: {
+        Row: {
+          attn: string
+          client_address: string
+          client_company: string
+          client_email: string
+          client_phone: string
+          created_by: string | null
+          discount: string
+          facilities: Json
+          gst_percent: string
+          id: string
+          intro_line: string
+          items: Json
+          project_title: string
+          quote_date: string
+          ref: string
+          saved_at: string
+          saved_by: string | null
+          subtotal: number
+          total: number
+        }
+        Insert: {
+          attn?: string
+          client_address?: string
+          client_company?: string
+          client_email?: string
+          client_phone?: string
+          created_by?: string | null
+          discount?: string
+          facilities?: Json
+          gst_percent?: string
+          id?: string
+          intro_line?: string
+          items?: Json
+          project_title?: string
+          quote_date?: string
+          ref?: string
+          saved_at?: string
+          saved_by?: string | null
+          subtotal?: number
+          total?: number
+        }
+        Update: {
+          attn?: string
+          client_address?: string
+          client_company?: string
+          client_email?: string
+          client_phone?: string
+          created_by?: string | null
+          discount?: string
+          facilities?: Json
+          gst_percent?: string
+          id?: string
+          intro_line?: string
+          items?: Json
+          project_title?: string
+          quote_date?: string
+          ref?: string
+          saved_at?: string
+          saved_by?: string | null
+          subtotal?: number
+          total?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
