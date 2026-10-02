@@ -91,6 +91,7 @@ function QuoteBuilder() {
     emptyQuote(DEFAULT_SETTINGS.lastRef),
   );
   const [tab, setTab] = useState<Tab>("quote");
+  const navigate = useNavigate();
   const [status, setStatus] = useState("");
 
   useEffect(() => {
@@ -245,6 +246,10 @@ function QuoteBuilder() {
             >
               History ({quotes.length})
             </button>
+
+            <button className={tabBtn(false)} onClick={handleLogout}>
+              Log out
+            </button>
           </nav>
 
           <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
@@ -311,9 +316,9 @@ function QuoteBuilder() {
                   setTab("quote");
                 }}
                 onDelete={(id) => {
-                  const next = quotes.filter((q) => q.id !== id);
-                  setQuotes(next);
-                  saveQuotes(next);
+                  deleteQuote(id)
+                    .then(() => setQuotes((qs) => qs.filter((q) => q.id !== id)))
+                    .catch(() => flash("Couldn't delete quotation"));
                 }}
               />
             )}
