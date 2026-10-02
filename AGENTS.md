@@ -10,5 +10,6 @@
 <!-- LOVABLE:END -->
 
 ## Quotation app
-- Quotation data and company settings live in browser localStorage via src/lib/quote-storage.ts (personal-use app, no backend by design).
-- The printable document is a single component (src/components/QuoteDocument.tsx) with a print-only full-width workspace and A4 content-area sizing in src/styles.css so window.print() stays at two pages despite the narrower screen preview.
+- Quotations and shared settings (single row id=1) live in Lovable Cloud tables via src/lib/quote-storage.ts, readable/writable only by signed-in users; accounts are created manually (no sign-up page).
+- The app lives under src/routes/_authenticated/ with /auth as the only public page, so nothing loads before login.
+- The printable document is a single component (src/components/QuoteDocument.tsx) with a print-only full-width workspace and A4 content-area sizing in src/styles.css ; items are chunked 12 per page with repeated headers, and the terms page always comes last, so page count grows with item count.
