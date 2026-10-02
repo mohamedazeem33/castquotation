@@ -243,7 +243,7 @@ export function QuoteDocument({ quote, settings }: { quote: Quote; settings: Set
             </tbody>
           </table>
         </div>
-        <Footer page={2} />
+        <Footer page={totalPages} total={totalPages} />
       </section>
     </div>
   );
