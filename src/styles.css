@@ -234,6 +234,7 @@
 .doc-facilities-list td { border: none; padding: 0.4mm 0; vertical-align: top; }
 .doc-letter { width: 6mm; }
 
+.doc-cont-head { margin-bottom: 4mm; }
 .doc-p2-logo { position: absolute; top: 14mm; right: 12mm; text-align: right; }
 .doc-terms-heading {
   margin-top: 12mm;
@@ -303,6 +304,8 @@
   .doc-attn { margin-top: 3mm; }
   .doc-title { margin-top: 4mm; font-size: 11px; line-height: 1.22; }
   .doc-intro { margin-top: 3mm; margin-bottom: 3mm; }
+  .doc-page { overflow: hidden; }
+  .doc-cont-head { margin-bottom: 3mm; }
   .doc-table, .doc-terms, .doc-sign { break-inside: avoid; page-break-inside: avoid; }
   .doc-table th, .doc-table td { padding: 4px 5px; }
   .doc-table thead { display: table-header-group; }
